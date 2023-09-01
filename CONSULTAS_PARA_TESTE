@@ -1,0 +1,80 @@
+
+3.1)
+
+SELECT p.nome_perfil, ps.codigo_servico, s.descricao
+FROM perfil_servico ps
+JOIN perfil p ON p.id_perfil = ps.perfil_id
+JOIN servico s ON s.id_serv = ps.servico_id;
+
+
+##############################################
+3.2)
+
+Consulta: 
+
+atraves da consulta SELECT * FROM historicops; temos o registro histórico dos serviços utilizados.
+
+Com a consulta temos a resposta da 3.2: 
+
+SELECT p.codigo_perfil, COUNT(h.id_registro) AS total_servicos
+FROM historicops h
+JOIN perfil p ON p.id_perfil = h.id_pessoa
+GROUP BY p.codigo_perfil
+ORDER BY total_servicos ASC;
+
+
+########################################################3
+3.3)
+
+
+SELECT DISTINCT pd.id_docente,
+    p.nome AS docente,
+    d.id_disciplina,
+    d.nome_disciplina,
+    pa.id_aluno,
+    pal.nome AS aluno
+FROM                       
+    oferecimento_docente od
+JOIN docente pd ON od.id_docente = pd.id_docente
+JOIN pessoa p ON pd.id_docente = p.id_pessoa
+JOIN oferecimento o ON od.id_oferecimento = o.id_oferecimento
+JOIN disciplina d ON o.id_disciplina = d.id_disciplina
+JOIN oferecimento_aluno oa ON o.id_oferecimento = oa.id_oferecimento
+JOIN aluno pa ON oa.id_aluno = pa.id_aluno
+JOIN pessoa pal ON pa.id_aluno = pal.id_pessoa
+WHERE
+    o.id_disciplina IN (
+        SELECT                            
+            d.id_disciplina
+        FROM                     
+            disciplina d
+        JOIN oferecimento o ON d.id_disciplina = o.id_disciplina
+        GROUP BY                  
+            d.id_disciplina
+        ORDER BY
+            COUNT(o.id_oferecimento) DESC
+        LIMIT 5                     
+    )                                             
+ORDER BY
+    d.id_disciplina;
+
+
+################################################################
+
+3.4) 
+SELECT pd.id_docente, p.nome AS docente, COUNT(*) AS total_oferecimentos
+FROM oferecimento_docente od
+JOIN docente pd ON od.id_docente = pd.id_docente
+JOIN pessoa p ON pd.id_docente = p.id_pessoa
+WHERE od.id_oferecimento IN (
+    SELECT id_oferecimento
+    FROM oferecimento
+    WHERE data_inicio >= '2020-05-01' AND data_fim <= '2023-05-31'
+)
+GROUP BY pd.id_docente, p.nome
+ORDER BY total_oferecimentos DESC
+LIMIT 5;
+
+
+###########################################################################
+
